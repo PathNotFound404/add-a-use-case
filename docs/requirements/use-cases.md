@@ -1486,6 +1486,7 @@ Details:
 
 **Associated Information:**
 - Consequence of the deactivation: The student will no longer be able to log in or submit weekly activity reports and peer evaluations, but the student's account and her previously submitted work are kept in the system. She remains in her course section and on her team. Her teammates no longer owe her a peer evaluation (BR-submission-owed) and cannot submit a new one for her; peer evaluations already submitted, by her or about her, are kept. Deactivation will NOT remove the student from the system, and the account can be reactivated in the future (UC-STU-reactivate-student: Reactivate a student). This is distinct from deletion (UC-STU-delete-student: Delete a student), which is a physical, unrecoverable delete. The course admin or instructor shall be able to cancel the use case at any time prior to submitting it.
+- A student who is logged in when she is deactivated loses access at her next request, not only at her next login: the system refuses that request and returns her to the login page (FR-SEC-active-account). Whatever is already on her screen stays visible until then, but nothing new can be read or saved.
 
 **Related Use Cases:** UC-STU-delete-student: Delete a student; UC-STU-reactivate-student: Reactivate a student
 **Assumptions:**
