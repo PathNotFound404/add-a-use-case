@@ -164,6 +164,39 @@ public class EvaluationIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName("UC-STU-deactivate-student: a peer evaluation of a deactivated teammate is refused, and nothing is saved")
+    void testStudentJohnAddEvaluationOfADeactivatedTeammate() throws Exception {
+        List<RatingDto> ratingDtos = List.of(
+                new RatingDto(null, 1, 4.0),
+                new RatingDto(null, 2, 9.0),
+                new RatingDto(null, 3, 7.0),
+                new RatingDto(null, 4, 10.0),
+                new RatingDto(null, 5, 5.0),
+                new RatingDto(null, 6, 6.0)
+        );
+
+        LocalDate fixedDate = LocalDate.of(2023, 9, 15); // 2023-W37, so 2023-W36 is the previous week, as in testStudentJohnAddEvaluation
+        Clock fixedClock = Clock.fixed(fixedDate.atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+        given(this.clock.instant()).willReturn(fixedClock.instant());
+        given(this.clock.getZone()).willReturn(fixedClock.getZone());
+
+        // Eric, John's teammate, is deactivated
+        this.entityManager.find(team.projectpulse.student.Student.class, 5).setEnabled(false);
+        this.entityManager.flush();
+
+        PeerEvaluationDto peerEvaluationDto = new PeerEvaluationDto(null, "2023-W36", 4, "John Smith", 5, "Eric Hudson", ratingDtos, 41.0, "Good job", "Keep it up", null, null);
+        String json = this.jsonMapper.writeValueAsString(peerEvaluationDto);
+
+        this.mockMvc.perform(post(this.baseUrl + "/evaluations").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, this.studentJohnToken))
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.INVALID_ARGUMENT))
+                .andExpect(jsonPath("$.message").value("This student's account is deactivated."));
+
+        Long saved = this.entityManager.createQuery("select count(e) from PeerEvaluation e where e.week = '2023-W36' and e.evaluator.id = 4 and e.evaluatee.id = 5", Long.class).getSingleResult();
+        assertThat(saved).isZero();
+    }
+
+    @Test
     void testStudentJohnAddEvaluationNotForPreviousWeek() throws Exception {
         List<RatingDto> ratingDtos = List.of(
                 new RatingDto(null, 1, 4.0),
