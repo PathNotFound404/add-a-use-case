@@ -11,7 +11,7 @@ public record StudentDto(Integer id,
                          String lastName,
                          @NotEmpty(message = "email is required.")
                          String email,
-                         boolean enabled,
+                         Boolean enabled, // Optional on update: absent (null) leaves the account status unchanged
                          String roles,
                          Integer sectionId,
                          String sectionName,

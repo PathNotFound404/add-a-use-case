@@ -9,8 +9,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -104,22 +102,25 @@ public class StudentService {
         return savedStudent;
     }
 
-    public Student updateStudent(Integer studentId, Student update) {
+    /**
+     * Updates a student's profile fields and, for an instructor caller, her account status.
+     *
+     * @param enabled the requested account status, or {@code null} to leave it unchanged. It is applied only when
+     *                the caller holds {@code ROLE_instructor} (a course admin's roles include it), and ignored for a
+     *                student editing her own profile. Setting it to {@code false} deactivates the student
+     *                (UC-STU-deactivate-student); her course section, team, and submitted work are kept.
+     */
+    public Student updateStudent(Integer studentId, Student update, Boolean enabled) {
         Student oldStudent = this.studentRepository.findById(studentId)
                 .orElseThrow(() -> new ObjectNotFoundException("student", studentId));
 
-        // If the user is not an admin, then the user can only update her username, first rubricName, last rubricName, and email
         oldStudent.setUsername(update.getUsername());
         oldStudent.setFirstName(update.getFirstName());
         oldStudent.setLastName(update.getLastName());
         oldStudent.setEmail(update.getEmail());
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // If the user is an admin, then the user can update all the fields
-        if (authentication.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_instructor"))) {
-            oldStudent.setEnabled(update.isEnabled());
-//            oldStudent.setRoles(update.getRoles());
+        if (enabled != null && this.userUtils.hasRole("ROLE_instructor")) {
+            oldStudent.setEnabled(enabled);
         }
 
         return this.studentRepository.save(oldStudent);
