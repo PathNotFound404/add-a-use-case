@@ -1477,7 +1477,7 @@ Details:
   - 5a1. The system leaves the student's account unchanged.
   - 5a2. Use case ends.
 - **6a. The student no longer exists in the system (for example, she was deleted after her details were displayed):**
-  - 6a1. The system alerts the course admin or instructor that the student was not found.
+  - 6a1. The system alerts the course admin or instructor that the student cannot be found or can no longer be changed.
   - 6a2. Use case ends.
 
 **Priority:** Low
