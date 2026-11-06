@@ -16,4 +16,10 @@ public interface UserRepository extends JpaRepository<PeerEvaluationUser, Intege
 
     List<PeerEvaluationUser> findByEmailIn(Collection<String> emails);
 
+    /**
+     * Is this an existing, active (not deactivated) account? Read on every Bearer-authenticated request
+     * (FR-SEC-active-account), so it is an existence query by primary key with no entity load.
+     */
+    boolean existsByIdAndEnabledTrue(Integer id);
+
 }
