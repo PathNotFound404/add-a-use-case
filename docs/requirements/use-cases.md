@@ -1522,9 +1522,10 @@ Details:
 **Extensions:**
 **Priority:** Low
 **Frequency of Use:** Rare. Occurs occasionally when a previously withdrawn student returns to a course section.
-**Business Rules:** BR-student-lifecycle
+**Business Rules:** BR-student-lifecycle, BR-submission-owed
 
 **Associated Information:**
+- Team membership on reactivation: deactivation keeps the student in her course section and on her team (UC-STU-deactivate-student: Deactivate a student), so reactivation puts her back to work on that same team with no further step. If she was taken off her team, or the team was deleted, while she was deactivated, reactivation does not put her back on it; the instructor assigns her to a team as usual. Once she is active again, BR-submission-owed applies to her again: she owes peer evaluations and weekly activity reports, and her teammates owe her a peer evaluation.
 - The course admin or instructor shall be able to cancel the use case at any time prior to submitting it.
 
 **Related Use Cases:** UC-STU-delete-student: Delete a student; UC-STU-deactivate-student: Deactivate a student
